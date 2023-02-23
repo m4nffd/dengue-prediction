@@ -24,10 +24,14 @@ def get_clusters_correlated_variables(df: pd.DataFrame, correlation_threshold=0.
     return pd.DataFrame({"feature": corr.columns, "cluster": clusters})
 
 
-def define_correlated_variable_groups(df: pd.DataFrame, correlation_threshold: float = 0.9):
+def define_correlated_variable_groups(
+    df: pd.DataFrame, correlation_threshold: float = 0.9
+):
     df = df.copy()
 
-    clusters = get_clusters_correlated_variables(df, correlation_threshold=correlation_threshold)
+    clusters = get_clusters_correlated_variables(
+        df, correlation_threshold=correlation_threshold
+    )
 
     variables_dictionary = {}
     correlated = clusters.groupby("cluster")["feature"].apply(list)

@@ -6,6 +6,6 @@ setup(
     version="1.0",
     packages=find_packages(),
     package_dir={
-            "dengue-prediction": "dengue_prediction",
-        },
+        "dengue-prediction": "dengue_prediction",
+    },
 )

@@ -2,7 +2,8 @@ import pandas as pd
 from copy import deepcopy
 from sklearn.metrics import mean_absolute_error
 
-def _lag_training_scores(model:object, X:pd.DataFrame, y:pd.Series, n_lag:int):
+
+def _lag_training_scores(model: object, X: pd.DataFrame, y: pd.Series, n_lag: int):
 
     _X = X.copy()
     _y = y.copy()
@@ -17,7 +18,10 @@ def _lag_training_scores(model:object, X:pd.DataFrame, y:pd.Series, n_lag:int):
 
     return mae
 
-def lag_training_scores(base_model:object, X:pd.DataFrame, y:pd.Series, N:int = 200):
+
+def lag_training_scores(
+    base_model: object, X: pd.DataFrame, y: pd.Series, N: int = 200
+):
 
     model = deepcopy(base_model)
 
@@ -26,6 +30,3 @@ def lag_training_scores(base_model:object, X:pd.DataFrame, y:pd.Series, N:int = 
         results[lag] = _lag_training_scores(model, X, y, n_lag=lag)
 
     return results
-
-
-
