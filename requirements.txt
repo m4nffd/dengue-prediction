@@ -6,8 +6,7 @@ contourpy==1.0.7
 cycler==0.11.0
 debugpy==1.6.6
 decorator==5.1.1
-# Editable Git install with no remote (dengue-prediction==1.0)
--e /Users/manueloffidani/Desktop/dengue_prediction
+-e git+https://github.com/m4nffd/dengue_prediction.git@1a726bed34a5efaf1424320360c8c28f873e4f34#egg=dengue_prediction
 executing==1.2.0
 fonttools==4.38.0
 importlib-metadata==6.0.0
@@ -21,6 +20,7 @@ jupyter_client==8.0.3
 jupyter_core==5.2.0
 kiwisolver==1.4.4
 klib==1.0.7
+lxml==4.9.2
 MarkupSafe==2.1.2
 matplotlib==3.7.0
 matplotlib-inline==0.1.6

@@ -10,7 +10,7 @@ import statsmodels.api as sm
 def create_lagged_features(df: pd.DataFrame, col: str, lag: int):
     df = df.copy()
 
-    df[col + f"_lag_{lag}"] = df.groupby("city")[col].shift(lag)
+    df[col + f"_lag_{lag}"] = df[col].shift(lag)
 
     return df
 
@@ -19,7 +19,7 @@ def _get_lagged_features(df: pd.DataFrame, lag: int, lag_label: bool = True):
 
     df = df.copy()
     # Create lagged features
-    for col in df.drop(["city", "weekofyear"], axis=1).columns:
+    for col in df.drop(["weekofyear"], axis=1).columns:
         for l in range(1, lag + 1):
             if (not lag_label) & (col == "total_cases"):
                 continue
@@ -104,11 +104,11 @@ def select_features(X: pd.DataFrame, y: pd.Series):
 def _train(X, y, conf: bool = False):
     features = select_features(X, y)
 
-    model_formula = "total_cases ~ 1 + city + " + " + ".join(features)
+    model_formula = "total_cases ~ 1 + " + " + ".join(features)
 
     model = SMFormulaWrapper(
         model_class=smf.glm,
-        family=sm.families.NegativeBinomial(alpha=0.001),
+        family=sm.families.NegativeBinomial(alpha=0.0001),
         formula=model_formula,
     )
 
@@ -160,6 +160,8 @@ def evaluate_test(df, city: int, lag: int = 10):
 
     df = df[df["city"] == city].copy()
 
+    df.drop("city", axis=1, inplace=True)
+
     A = df[df["train"] == 1].copy()
     B = df[df["train"] == 0].copy()
 
@@ -187,4 +189,4 @@ def evaluate_test(df, city: int, lag: int = 10):
         C.loc[i + 1, COLS] = C.loc[i + 1, COLS].fillna(value=dict(zip(COLS, p)))
         # print( C.loc[i+1, COLS])
 
-    return preds
+    return preds, model
