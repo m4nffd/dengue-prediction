@@ -15,7 +15,7 @@ def create_lagged_features(df: pd.DataFrame, col: str, lag: int):
     return df
 
 
-def _get_lagged_features(df: pd.DataFrame, lag:int, lag_label: bool = True):
+def _get_lagged_features(df: pd.DataFrame, lag: int, lag_label: bool = True):
 
     df = df.copy()
     # Create lagged features
@@ -26,7 +26,6 @@ def _get_lagged_features(df: pd.DataFrame, lag:int, lag_label: bool = True):
 
             df = create_lagged_features(df, col, l)
 
-
     return df
 
 
@@ -36,14 +35,13 @@ def create_lagged_training_sets(
     pred_lag: int = 1,
     lag_label: bool = True,
     use_predictions: bool = True,
-    only_train : bool = False
+    only_train: bool = False,
 ):
 
     df = df.copy()
 
     # Create lagged features
     df = _get_lagged_features(df, lag=lag, lag_label=lag_label)
-
 
     # Drop the nulls due to lag featurs
     X = df.drop("total_cases", axis=1).copy()
@@ -60,7 +58,7 @@ def create_lagged_training_sets(
         X_test = X.iloc[l:].copy()
         y_test = df["total_cases"].iloc[l:].copy()
     else:
-        X_train = X_test =  X.copy()
+        X_train = X_test = X.copy()
         y_train = y_test = y.copy()
 
     # Create lagged label
@@ -77,14 +75,14 @@ def create_lagged_training_sets(
             X_test[f"preds_{n}"] = model.predict(X_test)
     else:
 
-        X_train = X_train.iloc[:len(X_train)-pred_lag].copy()
+        X_train = X_train.iloc[: len(X_train) - pred_lag].copy()
         y_train = y_train.shift(-pred_lag).dropna()
 
-        X_test = X_test.iloc[:len(X_test)-pred_lag].copy()
+        X_test = X_test.iloc[: len(X_test) - pred_lag].copy()
         y_test = y_test.shift(-pred_lag).dropna().copy()
 
-        #X = X.iloc[:-pred_lag].copy().reset_index(drop=True)
-        #y = df["total_cases"].shift(-pred_lag).dropna().reset_index(drop=True)
+        # X = X.iloc[:-pred_lag].copy().reset_index(drop=True)
+        # y = df["total_cases"].shift(-pred_lag).dropna().reset_index(drop=True)
 
     return X_train, y_train, X_test, y_test
 
@@ -125,8 +123,8 @@ def get_preds_lagged_model(
     pred_lag: int = 1,
     lag_label: bool = True,
     use_predictions: bool = False,
-    only_train: bool=False,
-    return_model:bool=False
+    only_train: bool = False,
+    return_model: bool = False,
 ):
 
     df = df.copy()
@@ -138,7 +136,6 @@ def get_preds_lagged_model(
         lag_label=lag_label,
         use_predictions=use_predictions,
     )
-
 
     model = _train(X_train, y_train, conf=True)
     if return_model:
@@ -152,12 +149,12 @@ def get_preds_lagged_model(
     low_conf = pd.concat((low_conf, low_conf_test)).reset_index(drop=True)
     upp_conf = pd.concat((upp_conf, upp_conf_test)).reset_index(drop=True)
 
-    mae =  model._get_metrics(X_test, y_test)
+    mae = model._get_metrics(X_test, y_test)
 
     return preds, y, low_conf, upp_conf, mae
 
 
-def evaluate_test(df, city:int, lag:int=10):
+def evaluate_test(df, city: int, lag: int = 10):
 
     df = df.copy()
 
@@ -169,28 +166,25 @@ def evaluate_test(df, city:int, lag:int=10):
     C = _get_lagged_features(pd.concat((A, B)), lag=lag, lag_label=True)
     C = C[C["train"] == 0].copy().reset_index(drop=True)
 
-    model = get_preds_lagged_model(A, lag=lag, pred_lag=0, only_train=True, return_model=True)
+    model = get_preds_lagged_model(
+        A, lag=lag, pred_lag=0, only_train=True, return_model=True
+    )
 
     COLS = list(C.filter(regex="cases").columns)[1:]
 
     p = [np.nan] * lag
     preds = []
     for i in range(len(C)):
-       # print(i, end=" ")
+        # print(i, end=" ")
         x = model.predict(C.iloc[i]).values[0]
         preds.append(x)
-        if i == len(C)-1:
+        if i == len(C) - 1:
             break
         _ = p.pop()
         p = [x] + p
-        assert len(p) == lag#print(p)
-        #print(dict(zip(COLS[1:], p)))
-        C.loc[i+1, COLS] = C.loc[i+1, COLS].fillna(value=dict(zip(COLS, p)))
-        #print( C.loc[i+1, COLS])
+        assert len(p) == lag  # print(p)
+        # print(dict(zip(COLS[1:], p)))
+        C.loc[i + 1, COLS] = C.loc[i + 1, COLS].fillna(value=dict(zip(COLS, p)))
+        # print( C.loc[i+1, COLS])
 
     return preds
-
-
-
-
-

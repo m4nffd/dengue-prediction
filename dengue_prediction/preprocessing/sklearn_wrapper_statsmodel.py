@@ -16,10 +16,10 @@ class SMFormulaWrapper(BaseEstimator, RegressorMixin):
     def fit(self, X, y, test=False):
         if test:
             l = int(len(X) * 0.7)
-            self.X_train = X.iloc[: l].copy()
-            self.y_train = y.iloc[: l].copy()
-            self.X_test = X.iloc[l :].copy()
-            self.y_test = y.iloc[l :].copy()
+            self.X_train = X.iloc[:l].copy()
+            self.y_train = y.iloc[:l].copy()
+            self.X_test = X.iloc[l:].copy()
+            self.y_test = y.iloc[l:].copy()
         else:
             self.X_train = X.copy()
             self.y_train = y.copy()
@@ -48,8 +48,3 @@ class SMFormulaWrapper(BaseEstimator, RegressorMixin):
 
         preds = self.results_.predict(X_test)
         return mean_absolute_error(y_test, preds)
-
-
-
-
-        

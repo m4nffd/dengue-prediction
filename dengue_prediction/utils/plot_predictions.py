@@ -20,7 +20,6 @@ def plot_preds(y_true: pd.Series, y_preds: pd.Series, lc=None, uc=None, test=Tru
         ax.fill_between(range(l), lc[:l], uc[:l], alpha=1, color="orange")
         ax.fill_between(range(l, len(lc)), lc[l:], uc[l:], alpha=1, color="red")
 
-
     ax.set_ylabel("Cases")
     ax.set_xlabel("Week number")
     ax.legend()
