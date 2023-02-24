@@ -42,13 +42,14 @@ def get_regression_coefficients(df: pd.DataFrame) -> pd.DataFrame:
 
 def _fill_nulls(df: pd.DataFrame, coeff: dict, col: dict) -> pd.DataFrame:
 
-
     df = df.copy()
 
     kk = [k for k in coeff.keys() if k != "intercept"]
 
     f = lambda x, d: d["intercept"] + np.sum([d[c] * x[c] for c in kk])
-    df.loc[df[col].isna(), col] = df[df[col].isna()].apply(lambda x: f(x, coeff), axis=1)
+    df.loc[df[col].isna(), col] = df[df[col].isna()].apply(
+        lambda x: f(x, coeff), axis=1
+    )
 
     return df
 
@@ -62,7 +63,6 @@ def fill_nulls(df: pd.DataFrame, cols=List) -> pd.DataFrame:
     for c in cols:
         for k in coeffs[c].keys():
             df[cols] = _fill_nulls(df[cols], coeffs[c][k], c)
-
 
     return df
 
